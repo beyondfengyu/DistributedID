@@ -1,6 +1,6 @@
 package com.wolfbe.distributedid.http;
 
-import com.wolfbe.netty.util.DateTimeUtil;
+import com.wolfbe.distributedid.util.DateTimeUtil;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;

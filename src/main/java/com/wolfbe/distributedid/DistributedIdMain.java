@@ -3,5 +3,5 @@ package com.wolfbe.distributedid;
 /**
  * @author Andy
  */
-public class ServerMain {
+public class DistributedIdMain {
 }
