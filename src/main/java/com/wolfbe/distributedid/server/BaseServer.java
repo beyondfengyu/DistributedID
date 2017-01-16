@@ -1,4 +1,4 @@
-package com.wolfbe.distributedid;
+package com.wolfbe.distributedid.server;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -17,8 +17,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public abstract class BaseServer implements Server {
 
     protected Logger logger = LoggerFactory.getLogger(getClass());
-    protected String host = "localhost";
-    protected int port = 8099;
 
     protected DefaultEventLoopGroup defLoopGroup;
     protected NioEventLoopGroup bossGroup;

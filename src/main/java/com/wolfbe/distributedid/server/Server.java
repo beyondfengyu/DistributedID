@@ -1,4 +1,4 @@
-package com.wolfbe.distributedid;
+package com.wolfbe.distributedid.server;
 
 /**
  * @author Andy
