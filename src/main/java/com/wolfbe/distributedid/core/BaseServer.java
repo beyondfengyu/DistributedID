@@ -1,4 +1,4 @@
-package com.wolfbe.distributedid.server;
+package com.wolfbe.distributedid.core;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -24,6 +24,7 @@ public abstract class BaseServer implements Server {
     protected NioServerSocketChannel ssch;
     protected ChannelFuture cf;
     protected ServerBootstrap b;
+    protected int port;
 
     public void init(){
         defLoopGroup = new DefaultEventLoopGroup(8, new ThreadFactory() {
@@ -61,5 +62,13 @@ public abstract class BaseServer implements Server {
         }
         bossGroup.shutdownGracefully();
         workGroup.shutdownGracefully();
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
     }
 }

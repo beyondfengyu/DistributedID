@@ -1,4 +1,4 @@
-package com.wolfbe.distributedid.algorithm;
+package com.wolfbe.distributedid.core;
 
 /**
  * twitter的snowflake算法 -- java实现
@@ -9,7 +9,8 @@ package com.wolfbe.distributedid.algorithm;
 public class SnowFlake {
 
     /**
-     * 起始的时间戳
+     * 起始的时间戳，可以修改为服务第一次启动的时间
+     * 一旦服务已经开始使用，起始时间戳就不应该改变
      */
     private final static long START_STMP = 1480166465631L;
 
@@ -39,26 +40,14 @@ public class SnowFlake {
     private long sequence = 0L; //序列号
     private long lastStmp = -1L;//上一次时间戳
 
-    /**
-     *  通过单例模式来获取实例
-     */
-    private static SnowFlake snowFlake;
 
     /**
      * 通过单例模式来获取实例
      * 分布式部署服务时，数据节点标识和机器标识作为联合键必须唯一
      * @param datacenterId 数据节点标识ID
      * @param machineId 机器标识ID
-     * @return
      */
-    public static SnowFlake getInstance(long datacenterId, long machineId) {
-        if (snowFlake == null) {
-            snowFlake = new SnowFlake(datacenterId, machineId);
-        }
-        return snowFlake;
-    }
-
-    private SnowFlake(long datacenterId, long machineId) {
+    public SnowFlake(long datacenterId, long machineId) {
         if (datacenterId > MAX_DATACENTER_NUM || datacenterId < 0) {
             throw new IllegalArgumentException("datacenterId can't be greater than MAX_DATACENTER_NUM or less than 0");
         }

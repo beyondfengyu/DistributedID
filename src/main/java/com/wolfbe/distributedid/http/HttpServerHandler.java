@@ -1,13 +1,15 @@
 package com.wolfbe.distributedid.http;
 
-import com.wolfbe.distributedid.util.DateTimeUtil;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
+import com.wolfbe.distributedid.core.SnowFlake;
+import com.wolfbe.distributedid.util.GlobalConfig;
+import com.wolfbe.distributedid.util.NettyUtil;
+import io.netty.channel.*;
 import io.netty.handler.codec.http.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 /**
  *  自定义的处理器，目前支持三种请求：
@@ -19,41 +21,59 @@ import org.slf4j.LoggerFactory;
 public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
+    /**
+     * 通过信号量来控制流量
+     */
+    private Semaphore semaphore = new Semaphore(GlobalConfig.getHandleTps());
+    private SnowFlake snowFlake;
+
+    public HttpServerHandler(SnowFlake snowFlake) {
+        this.snowFlake = snowFlake;
+    }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request)
             throws Exception {
-        String uri = request.uri();
+        String uri = getUriNoSprit(request);
         logger.info(">>>>>> request uri is: {}", uri);
         FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
-        switch (uri) {
-            case "/getTime": //获取当前的时间
-                String curTime = DateTimeUtil.getCurrentTime();
-                StringBuffer buffer = new StringBuffer();
-                buffer.append("<div>当前时间：").append(curTime).append("</div>");
-                response.content().writeBytes(buffer.toString().getBytes());
-                break;
-            case "/clientInfo": //获取客户端的信息
-                String client = request.headers().get("User-Agent");
-                response.content().writeBytes(client.getBytes());
-                break;
-            default:// 404，请求找不到
-                String info = "<div style='align:center;font-size:30px;'>404, Can not found the page</div>";
-                response.content().writeBytes(info.getBytes());
-                response.setStatus(HttpResponseStatus.NOT_FOUND);
-                break;
+        if (GlobalConfig.HTTP_REQUEST.equals(uri)) {
+            if (semaphore.tryAcquire(GlobalConfig.ACQUIRE_TIMEOUTMILLIS, TimeUnit.MILLISECONDS)) {
+                try {
+                    long id = snowFlake.nextId();
+                    logger.info("HttpServerHandler id is: {}", id);
+                    response.content().writeBytes((""+id).getBytes());
+                    ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
+                }catch (Exception e){
+                    semaphore.release();
+                    logger.error("HttpServerHandler error", e);
+                }
+            }else{
+                String info = String.format("HttpServerHandler tryAcquire semaphore timeout, %dms, waiting thread " +
+                                "nums: %d availablePermit: %d",     //
+                        GlobalConfig.ACQUIRE_TIMEOUTMILLIS, //
+                        this.semaphore.getQueueLength(),    //
+                        this.semaphore.availablePermits()   //
+                );
+                logger.warn(info);
+                throw new Exception(info);
+            }
         }
-        ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        logger.error("connection error", cause);
-        ctx.channel().close().addListener(new ChannelFutureListener() {
-            @Override
-            public void operationComplete(ChannelFuture channelFuture) throws Exception {
-                logger.info("connection close complete!!");
-            }
-        });
+        Channel channel = ctx.channel();
+        logger.error("HttpServerHandler channel [{}] error and will be closed", NettyUtil.parseRemoteAddr(channel), cause);
+        NettyUtil.closeChannel(channel);
+    }
+
+
+    private String getUriNoSprit(FullHttpRequest request) {
+        String uri = request.uri();
+        if (uri.startsWith("/")) {
+            uri = uri.substring(1);
+        }
+        return uri;
     }
 }

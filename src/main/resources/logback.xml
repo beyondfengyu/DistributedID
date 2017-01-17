@@ -6,7 +6,7 @@
         <Encoding>UTF-8</Encoding>
         <File>/data/java/distributedid.wolfbe.com.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>/data/java/distributedid.wolfbe.com.log.%d{yyyy-MM-dd-HH}</fileNamePattern>
+            <fileNamePattern>/data/java/distributedid.wolfbe.com.log.%d{yyyy-MM-dd}</fileNamePattern>
             <maxHistory>30</maxHistory>
         </rollingPolicy>
         <encoder>
