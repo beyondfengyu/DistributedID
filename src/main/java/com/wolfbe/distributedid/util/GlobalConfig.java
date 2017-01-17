@@ -31,7 +31,8 @@ public class GlobalConfig {
     /**
      * 流量控制，表示每秒处理的并发数
      */
-    public static int HANDLE_TPS = 10000;
+    public static int HANDLE_HTTP_TPS = 10000;
+    public static int HANDLE_SDKS_TPS = 10000;
     public static int ACQUIRE_TIMEOUTMILLIS = 1000;
 
     public static String getDefaultHost() {
@@ -98,13 +99,6 @@ public class GlobalConfig {
         MACHINES_SIGN = machinesSign;
     }
 
-    public static int getHandleTps() {
-        return HANDLE_TPS;
-    }
-
-    public static void setHandleTps(int handleTps) {
-        HANDLE_TPS = handleTps;
-    }
 
     public static int getAcquireTimeoutmillis() {
         return ACQUIRE_TIMEOUTMILLIS;

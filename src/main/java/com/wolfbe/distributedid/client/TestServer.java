@@ -48,11 +48,11 @@ public class TestServer extends BaseServer {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
                         ch.pipeline().addLast(defLoopGroup,
-                                new FixedLengthFrameDecoder(5),
-                                new StringDecoder(Charset.forName("utf-8")),
+//                                new FixedLengthFrameDecoder(5),
+//                                new StringDecoder(Charset.forName("utf-8")),
 //                                new StringEncoder(Charset.forName("utf-8")),
-                                new TestHandler(),
-                                new TestHandler2()    //自定义处理器
+                                new TestHandler()
+//                                new TestHandler2()    //自定义处理器
                         );
                     }
                 });
@@ -72,8 +72,7 @@ public class TestServer extends BaseServer {
                     for (Channel ch : keySet) {
                         logger.info("send 2L");
                         ByteBuffer buffer = ByteBuffer.allocate(8);
-                        buffer.putLong(233L);
-                        buffer.flip();
+                        buffer.putLong(2L);
                         ch.writeAndFlush(buffer);
                     }
                 }

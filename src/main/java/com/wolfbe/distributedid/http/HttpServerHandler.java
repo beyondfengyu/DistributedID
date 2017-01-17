@@ -24,7 +24,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
     /**
      * 通过信号量来控制流量
      */
-    private Semaphore semaphore = new Semaphore(GlobalConfig.getHandleTps());
+    private Semaphore semaphore = new Semaphore(GlobalConfig.HANDLE_HTTP_TPS);
     private SnowFlake snowFlake;
 
     public HttpServerHandler(SnowFlake snowFlake) {

@@ -1,9 +1,12 @@
-package com.wolfbe.distributedid.core;
+package com.wolfbe.distributedid.client;
 
+import com.alibaba.fastjson.JSON;
+import com.wolfbe.distributedid.sdks.SdkProto;
 import com.wolfbe.distributedid.util.GlobalConfig;
 import com.wolfbe.distributedid.util.NettyUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -13,6 +16,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.ByteBuffer;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -23,6 +27,7 @@ public abstract class BaseClient implements Client {
 
     protected Logger logger = LoggerFactory.getLogger(getClass());
 
+    protected AtomicInteger rqid = new AtomicInteger(0);
     protected NioEventLoopGroup workGroup;
     protected ChannelFuture cf;
     protected Bootstrap b;
@@ -64,7 +69,12 @@ public abstract class BaseClient implements Client {
 
     @Override
     public void invokeAsync(long timeoutMillis, InvokeCallback invokeCallback) {
-
+        SdkProto sdkProto = new SdkProto(rqid.incrementAndGet(),0);
+        ByteBuffer buffer = ByteBuffer.allocate(12);
+        buffer.putInt(rqid.incrementAndGet());
+        buffer.putLong(0L);
+        buffer.flip();
+        cf.channel().writeAndFlush(sdkProto);
     }
 
     @Override

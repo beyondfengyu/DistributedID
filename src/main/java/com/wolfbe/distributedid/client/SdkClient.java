@@ -1,22 +1,18 @@
 package com.wolfbe.distributedid.client;
 
-import com.wolfbe.distributedid.core.BaseClient;
+import com.wolfbe.distributedid.sdks.SdkServerDecoder;
+import com.wolfbe.distributedid.sdks.SdkServerEncoder;
 import com.wolfbe.distributedid.util.GlobalConfig;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.FixedLengthFrameDecoder;
-import io.netty.handler.codec.string.StringDecoder;
-import io.netty.handler.codec.string.StringEncoder;
 
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.nio.charset.Charset;
 
 /**
- * @author laochunyu
+ * @author Andy
  */
 public class SdkClient extends BaseClient{
 
@@ -32,11 +28,9 @@ public class SdkClient extends BaseClient{
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
                         ChannelPipeline pipeline = ch.pipeline();
-                        pipeline.addLast(new StringEncoder(Charset.defaultCharset()))
-                                .addLast(new StringDecoder(Charset.defaultCharset()))
-//                                .addLast("LongHandler", new LongHandler())
-                                .addLast("SdkHandler", new SdkHandler());
-//                                .addLast(new FixedLengthFrameDecoder(8))
+                        pipeline.addLast("SdkServerDecoder", new SdkServerDecoder(12))
+                                .addLast("SdkServerEncoder", new SdkServerEncoder())
+                                .addLast("SdkClientHandler", new SdkClientHandler());
                     }
                 });
         try {

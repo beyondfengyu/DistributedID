@@ -1,4 +1,4 @@
-package com.wolfbe.distributedid.core;
+package com.wolfbe.distributedid.client;
 
 import io.netty.channel.Channel;
 

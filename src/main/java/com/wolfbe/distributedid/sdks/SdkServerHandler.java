@@ -7,7 +7,6 @@ import io.netty.channel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.ByteBuffer;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -22,7 +21,7 @@ public class SdkServerHandler extends SimpleChannelInboundHandler {
     /**
      * 通过信号量来控制流量
      */
-    private Semaphore semaphore = new Semaphore(GlobalConfig.getHandleTps());
+    private Semaphore semaphore = new Semaphore(GlobalConfig.HANDLE_SDKS_TPS);
     private SnowFlake snowFlake;
 
     public SdkServerHandler(SnowFlake snowFlake) {
@@ -31,34 +30,31 @@ public class SdkServerHandler extends SimpleChannelInboundHandler {
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
-        logger.info("SdkServerHandler msg is: {}", msg);
-        if (GlobalConfig.SDKS_REQUEST.equals(msg)) {
-            if(semaphore.tryAcquire(GlobalConfig.ACQUIRE_TIMEOUTMILLIS, TimeUnit.MILLISECONDS)) {
+        if (msg instanceof SdkProto) {
+            SdkProto sdkProto = (SdkProto) msg;
+            logger.info("SdkServerHandler msg is: {}", sdkProto.toString());
+            if (semaphore.tryAcquire(GlobalConfig.ACQUIRE_TIMEOUTMILLIS, TimeUnit.MILLISECONDS)) {
                 try {
-                    SdkServer.map.put(ctx.channel(), NettyUtil.parseRemoteAddr(ctx.channel()));
-                    long id = snowFlake.nextId();
-                    ByteBuffer buf = ByteBuffer.allocate(8);
-                    buf.putLong(id);
-                    buf.flip();
-                    logger.info("SdkServerHandler id is: {}", id);
-                    ctx.channel().writeAndFlush(buf).addListener(new ChannelFutureListener() {
-
+                    long did = snowFlake.nextId();
+                    logger.info("SdkServerHandler did is: {}", did);
+                    sdkProto.setDid(did);
+                    ctx.channel().writeAndFlush(sdkProto).addListener(new ChannelFutureListener() {
                         @Override
                         public void operationComplete(ChannelFuture channelFuture) throws Exception {
-                            logger.info("complete");
+                            semaphore.release();
                         }
                     });
-                } catch (Exception e){
+                } catch (Exception e) {
                     semaphore.release();
                     logger.error("SdkServerhandler error", e);
                 }
-            }else{
+            } else {
                 String info = String.format("SdkServerHandler tryAcquire semaphore timeout, %dms, waiting thread " +
                                 "nums: %d availablePermit: %d",     //
-                                GlobalConfig.ACQUIRE_TIMEOUTMILLIS, //
-                                this.semaphore.getQueueLength(),    //
-                                this.semaphore.availablePermits()   //
-                        );
+                        GlobalConfig.ACQUIRE_TIMEOUTMILLIS, //
+                        this.semaphore.getQueueLength(),    //
+                        this.semaphore.availablePermits()   //
+                );
                 logger.warn(info);
                 throw new Exception(info);
             }
@@ -68,7 +64,7 @@ public class SdkServerHandler extends SimpleChannelInboundHandler {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         Channel channel = ctx.channel();
-        logger.error("SdkServerHandler channel [{}] error and will be closed", NettyUtil.parseRemoteAddr(channel),cause);
+        logger.error("SdkServerHandler channel [{}] error and will be closed", NettyUtil.parseRemoteAddr(channel), cause);
         NettyUtil.closeChannel(channel);
     }
 }
