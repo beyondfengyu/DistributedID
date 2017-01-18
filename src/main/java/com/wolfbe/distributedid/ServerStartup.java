@@ -8,8 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 两个服务器进程最好用一个SnowFlake实例，
- * 部署分布式环境时SnowFlake的datacenterId和machineId作为联合键必须全局唯一,
+ * 两个服务器进程最好用同一个SnowFlake实例，
+ * 部署在分布式环境时，SnowFlake的datacenterId和machineId作为联合键必须全局唯一,
  * 否则多个节点的服务可能产生相同的ID
  * @author Andy
  */

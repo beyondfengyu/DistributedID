@@ -31,8 +31,22 @@ public class SdkServerDecoder extends FixedLengthFrameDecoder {
 
     @Override
     protected Object decode(ChannelHandlerContext ctx, ByteBuf in) throws Exception {
-        ByteBuf buf = (ByteBuf) super.decode(ctx, in);
-        return new SdkProto(buf.readInt(), buf.readLong());
+        ByteBuf buf = null;
+        try {
+            buf = (ByteBuf) super.decode(ctx, in);
+            if (buf == null) {
+                return null;
+            }
+            return new SdkProto(buf.readInt(), buf.readLong());
+        } catch (Exception e) {
+            logger.error("decode exception, " + NettyUtil.parseRemoteAddr(ctx.channel()), e);
+            NettyUtil.closeChannel(ctx.channel());
+        }finally {
+            if (buf != null) {
+                buf.release();
+            }
+        }
+        return null;
     }
 
     @Override

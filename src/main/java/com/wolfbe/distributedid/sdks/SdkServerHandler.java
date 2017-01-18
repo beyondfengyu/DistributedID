@@ -1,6 +1,7 @@
 package com.wolfbe.distributedid.sdks;
 
 import com.wolfbe.distributedid.core.SnowFlake;
+import com.wolfbe.distributedid.exception.RemotingTooMuchRequestException;
 import com.wolfbe.distributedid.util.GlobalConfig;
 import com.wolfbe.distributedid.util.NettyUtil;
 import io.netty.channel.*;
@@ -11,8 +12,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 由于请求的协议很简单，只有5字符：getid
- * 解码时使用FixedLengthFrameDecoder即可
+ * 通过雪花算法生成唯一ID，写入Channel返回
  *
  * @author Andy
  */
@@ -30,14 +30,12 @@ public class SdkServerHandler extends SimpleChannelInboundHandler {
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
-        if (msg instanceof SdkProto) {
+        if (msg != null && msg instanceof SdkProto) {
             SdkProto sdkProto = (SdkProto) msg;
             logger.info("SdkServerHandler msg is: {}", sdkProto.toString());
             if (semaphore.tryAcquire(GlobalConfig.ACQUIRE_TIMEOUTMILLIS, TimeUnit.MILLISECONDS)) {
                 try {
-                    long did = snowFlake.nextId();
-                    logger.info("SdkServerHandler did is: {}", did);
-                    sdkProto.setDid(did);
+                    sdkProto.setDid(snowFlake.nextId());
                     ctx.channel().writeAndFlush(sdkProto).addListener(new ChannelFutureListener() {
                         @Override
                         public void operationComplete(ChannelFuture channelFuture) throws Exception {
@@ -56,7 +54,7 @@ public class SdkServerHandler extends SimpleChannelInboundHandler {
                         this.semaphore.availablePermits()   //
                 );
                 logger.warn(info);
-                throw new Exception(info);
+                throw new RemotingTooMuchRequestException(info);
             }
         }
     }

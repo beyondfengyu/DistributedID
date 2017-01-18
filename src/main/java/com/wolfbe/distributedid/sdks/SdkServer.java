@@ -36,7 +36,7 @@ public class SdkServer extends BaseServer {
                     protected void initChannel(SocketChannel ch) throws Exception {
                         ch.pipeline().addLast(defLoopGroup,
                                 new SdkServerDecoder(12),  // 自定义解码器
-                                new SdkServerEncoder(),   // 自定义编码器
+                                new SdkServerEncoder(),    // 自定义编码器
                                 new SdkServerHandler(snowFlake) // 自定义处理器
                         );
                     }

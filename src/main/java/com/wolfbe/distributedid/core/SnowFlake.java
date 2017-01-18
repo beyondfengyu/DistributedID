@@ -103,10 +103,11 @@ public class SnowFlake {
 
     public static void main(String[] args) {
         SnowFlake snowFlake = new SnowFlake(2, 3);
-
-        for (int i = 0; i < (1 << 12); i++) {
-            System.out.println(snowFlake.nextId());
+        long start = System.currentTimeMillis();
+        for (int i = 0; i < (1 << 18); i++) {
+            System.out.println(i+": "+snowFlake.nextId());
         }
-
+        long end = System.currentTimeMillis();
+        System.out.println(end - start);
     }
 }
