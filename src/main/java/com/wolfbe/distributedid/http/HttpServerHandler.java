@@ -1,6 +1,7 @@
 package com.wolfbe.distributedid.http;
 
 import com.wolfbe.distributedid.core.SnowFlake;
+import com.wolfbe.distributedid.exception.RemotingTooMuchRequestException;
 import com.wolfbe.distributedid.util.GlobalConfig;
 import com.wolfbe.distributedid.util.NettyUtil;
 import io.netty.channel.*;
@@ -56,7 +57,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
                         this.semaphore.availablePermits()   //
                 );
                 logger.warn(info);
-                throw new Exception(info);
+                throw new RemotingTooMuchRequestException(info);
             }
         }
     }

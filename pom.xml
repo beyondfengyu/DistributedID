@@ -82,7 +82,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.wolfbe.chat.HappyChatMain</mainClass>
+                            <mainClass>com.wolfbe.distributedid.ServerStartup</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

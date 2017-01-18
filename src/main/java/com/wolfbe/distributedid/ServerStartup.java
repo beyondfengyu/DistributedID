@@ -7,6 +7,8 @@ import com.wolfbe.distributedid.util.GlobalConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Date;
+
 /**
  * 两个服务器进程最好用同一个SnowFlake实例，
  * 部署在分布式环境时，SnowFlake的datacenterId和machineId作为联合键必须全局唯一,
@@ -39,7 +41,7 @@ public class ServerStartup {
         sdkServer.init();
         sdkServer.start();
 
-        System.out.println(String.format(">>>>>Server start success, SnowFlake datacenterId is %d, machineId is %d",
+        System.out.println(String.format(new Date().getTime()+">>>>>Server start success, SnowFlake datacenterId is %d, machineId is %d",
                 datacenterId,
                 machineId
         ));

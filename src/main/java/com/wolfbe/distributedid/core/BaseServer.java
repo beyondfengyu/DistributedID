@@ -62,6 +62,7 @@ public abstract class BaseServer implements Server {
         }
         bossGroup.shutdownGracefully();
         workGroup.shutdownGracefully();
+        logger.info("Server EventLoopGroup shutdown finish");
     }
 
     public int getPort() {
