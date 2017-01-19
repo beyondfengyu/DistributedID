@@ -32,7 +32,7 @@ public class SdkServerHandler extends SimpleChannelInboundHandler {
     protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
         if (msg != null && msg instanceof SdkProto) {
             SdkProto sdkProto = (SdkProto) msg;
-            logger.info("SdkServerHandler msg is: {}", sdkProto.toString());
+//            logger.info("SdkServerHandler msg is: {}", sdkProto.toString());
             if (semaphore.tryAcquire(GlobalConfig.ACQUIRE_TIMEOUTMILLIS, TimeUnit.MILLISECONDS)) {
                 try {
                     sdkProto.setDid(snowFlake.nextId());
@@ -47,6 +47,8 @@ public class SdkServerHandler extends SimpleChannelInboundHandler {
                     logger.error("SdkServerhandler error", e);
                 }
             } else {
+                sdkProto.setDid(-1);
+                ctx.channel().writeAndFlush(sdkProto);
                 String info = String.format("SdkServerHandler tryAcquire semaphore timeout, %dms, waiting thread " +
                                 "nums: %d availablePermit: %d",     //
                         GlobalConfig.ACQUIRE_TIMEOUTMILLIS, //

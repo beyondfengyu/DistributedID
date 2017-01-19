@@ -32,8 +32,8 @@ public class GlobalConfig {
      * 流量控制，表示每秒处理的并发数
      */
     public static int HANDLE_HTTP_TPS = 10000;
-    public static int HANDLE_SDKS_TPS = 10000;
-    public static int ACQUIRE_TIMEOUTMILLIS = 1000;
+    public static int HANDLE_SDKS_TPS = 50000;
+    public static int ACQUIRE_TIMEOUTMILLIS = 5000;
 
     public static String getDefaultHost() {
         return DEFAULT_HOST;
