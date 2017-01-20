@@ -21,7 +21,7 @@
 HTTP的接入方式很简单，直接访问IP+端口即可，或者域名+端口，端口号固定为**16830**。如果你不喜欢这种带有端口号的方式，可以考虑配置Nginx来做代理转发，配置Nginx对于部署分布式ID集群也有好处，可以通过Nginx来做负载均衡。
 <br>
 ### SDK接入
-SDK接入前需要在自己的项目中加入SDK的jar包，SDK可以参照我的另外一个项目(DistributedID-SDK)[https://github.com/beyondfengyu/DistributedID-SDK]，或者自己写一个SDK来接入，语言不限。**DistributedID-SDK**提供了同步和异步两种请求方式，如果有高并发的要求，建议使用异步请求的方式，相同的环境下异步请求的性能会比同步请求的性能更高。
+SDK接入前需要在自己的项目中加入SDK的jar包，SDK可以参照我的另外一个项目[DistributedID-SDK]("https://github.com/beyondfengyu/DistributedID-SDK")，或者自己写一个SDK来接入，语言不限。**DistributedID-SDK**提供了同步和异步两种请求方式，如果有高并发的要求，建议使用异步请求的方式，相同的环境下异步请求的性能会比同步请求的性能更高。
 <br>
 ## 部署
 部署之前需要把项目源码打包成jar包，或者使用项目打包好的jar包，把jar包上传到服务器，执行如下命令：
