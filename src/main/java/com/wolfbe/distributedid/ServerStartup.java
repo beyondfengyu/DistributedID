@@ -34,7 +34,7 @@ public class ServerStartup {
         // 启动Http服务器
         final HttpServer httpServer = new HttpServer(snowFlake);
         httpServer.init();
-//        httpServer.start();
+        httpServer.start();
 
         // 启动Sdk服务器
         final SdkServer sdkServer = new SdkServer(snowFlake);
