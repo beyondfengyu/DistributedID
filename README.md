@@ -7,7 +7,7 @@
 <br><br>
 具体的教程可以参考我写的一篇文章：[基于twitter雪花算法的分布式ID —— 服务器篇](http://www.wolfbe.com/detail/201701/386.html)
 <br><br>
-**温馨提示：**各位同学在fork之前，希望能够给个star，尊重一下作者的努力。
+**温馨提示：** 各位同学在fork之前，希望能够给个star，尊重一下作者的努力。
 <br><br><br>
 ## 特点
 * 基于twitter的雪花算法生成ID;
